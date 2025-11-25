@@ -1,0 +1,116 @@
+.code-editor-container {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  background: #1e1e1e;
+}
+
+.code-editor-container .code-input-layer,
+.code-editor-container .code-highlight-layer {
+  margin: 0;
+  padding: 16px;
+  padding-left: 50px;
+  border: none;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  tab-size: 4;
+  white-space: pre;
+  word-wrap: normal;
+  overflow-wrap: normal;
+}
+
+.code-editor-container .code-input-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  resize: none;
+  outline: none;
+  background: transparent;
+  color: transparent;
+  caret-color: #fff;
+  z-index: 2;
+  -webkit-text-fill-color: transparent;
+}
+
+.code-editor-container .code-input-layer::selection {
+  background-color: rgba(38, 79, 120, 0.99);
+}
+
+.code-editor-container .code-highlight-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  pointer-events: none;
+  z-index: 1;
+  background: #1e1e1e;
+}
+
+.code-editor-container .code-highlight-layer code {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Override Prism theme colors for VS Code style */
+.code-editor-container .token.comment {
+  color: #6a9955;
+  font-style: italic;
+}
+
+.code-editor-container .token.keyword {
+  color: #569cd6;
+}
+
+.code-editor-container .token.string {
+  color: #ce9178;
+}
+
+.code-editor-container .token.number {
+  color: #b5cea8;
+}
+
+.code-editor-container .token.function {
+  color: #dcdcaa;
+}
+
+.code-editor-container .token.class-name {
+  color: #4ec9b0;
+}
+
+.code-editor-container .token.builtin {
+  color: #4ec9b0;
+}
+
+.code-editor-container .token.operator {
+  color: #d4d4d4;
+}
+
+.code-editor-container .token.punctuation {
+  color: #d4d4d4;
+}
+
+/* Scrollbar styling */
+.code-highlight-layer::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.code-highlight-layer::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+.code-highlight-layer::-webkit-scrollbar-thumb {
+  background: #424242;
+  border-radius: 5px;
+}
+
+.code-highlight-layer::-webkit-scrollbar-thumb:hover {
+  background: #4e4e4e;
+}

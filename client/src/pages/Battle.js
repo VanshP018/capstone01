@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { generateBoilerplate } from '../utils/boilerplateGenerator';
+import CodeEditor from '../components/CodeEditor';
+import SubmitModal from '../components/SubmitModal';
 import './Battle.css';
 
 const Battle = ({ user }) => {
@@ -12,6 +15,11 @@ const Battle = ({ user }) => {
   const [error, setError] = useState('');
   const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
+  const [boilerplateSet, setBoilerplateSet] = useState(false); // Track if boilerplate is already set
+  const [testResult, setTestResult] = useState(null); // 'pass', 'fail', or null
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [submitTestResults, setSubmitTestResults] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchBattleQuestion = async () => {
@@ -52,6 +60,12 @@ const Battle = ({ user }) => {
 
         if (selectedQuestion) {
           setQuestion(selectedQuestion);
+          // Only set boilerplate once on initial load
+          if (!boilerplateSet) {
+            const boilerplate = generateBoilerplate(selectedQuestion);
+            setCodeInput(boilerplate);
+            setBoilerplateSet(true);
+          }
           setError('');
         } else {
           setError('Question not found');
@@ -69,16 +83,18 @@ const Battle = ({ user }) => {
     // Poll for updates every 2 seconds
     const interval = setInterval(fetchBattleQuestion, 2000);
     return () => clearInterval(interval);
-  }, [code]);
+  }, [code, boilerplateSet]);
 
   const handleRunCode = async () => {
     if (!codeInput.trim()) {
       setOutput('Error: Please write some code first');
+      setTestResult(null);
       return;
     }
 
     setIsRunning(true);
     setOutput('Running code...\n');
+    setTestResult(null);
     
     try {
       // Using Piston API for code execution
@@ -109,42 +125,197 @@ const Battle = ({ user }) => {
 
       if (data.run) {
         let outputText = '';
+        let actualOutput = '';
         
         if (data.run.stdout) {
+          actualOutput = data.run.stdout.trim();
           outputText += '=== Output ===\n' + data.run.stdout;
         }
         
         if (data.run.stderr) {
           outputText += '\n=== Errors ===\n' + data.run.stderr;
+          setTestResult('fail');
         }
         
         if (data.run.code !== 0) {
           outputText += `\n\nExit code: ${data.run.code}`;
+          setTestResult('fail');
         }
         
         if (!data.run.stdout && !data.run.stderr) {
           outputText = 'Code executed successfully with no output.';
         }
 
+        // Compare with expected output from sample testcase
+        if (question && question.sample_testcase && actualOutput && !data.run.stderr && data.run.code === 0) {
+          const expectedOutput = String(question.sample_testcase.output).trim();
+          const normalizedActual = actualOutput.replace(/\s+/g, ' ');
+          const normalizedExpected = expectedOutput.replace(/\s+/g, ' ');
+          
+          if (normalizedActual === normalizedExpected) {
+            setTestResult('pass');
+            outputText += `\n\n✓ Sample test case passed!`;
+          } else {
+            setTestResult('fail');
+            outputText += `\n\n✗ Sample test case failed`;
+            outputText += `\nExpected: ${expectedOutput}`;
+            outputText += `\nGot: ${actualOutput}`;
+          }
+        }
+
         setOutput(outputText || 'No output');
       } else {
         setOutput('Error: Failed to execute code');
+        setTestResult('fail');
       }
     } catch (err) {
       setOutput('Error executing code: ' + err.message);
+      setTestResult('fail');
     } finally {
       setIsRunning(false);
     }
   };
 
   const handleSubmit = async () => {
-    // First run the code
-    await handleRunCode();
+    if (!question || !question.testcases) {
+      alert('No test cases available for this question');
+      return;
+    }
+
+    // Initialize test results
+    const initialResults = question.testcases.map((_, index) => ({
+      status: 'pending',
+      expected: null,
+      actual: null,
+      error: null
+    }));
     
-    // Show submission feedback
-    setTimeout(() => {
-      alert('Code submitted successfully! Full test suite evaluation coming soon.');
-    }, 500);
+    setSubmitTestResults(initialResults);
+    setShowSubmitModal(true);
+    setIsSubmitting(true);
+
+    // Run test cases one by one
+    let allPassed = true;
+    for (let i = 0; i < question.testcases.length; i++) {
+      const testcase = question.testcases[i];
+      
+      // Update status to running
+      setSubmitTestResults(prev => {
+        const updated = [...prev];
+        updated[i] = { ...updated[i], status: 'running' };
+        return updated;
+      });
+
+      try {
+        // Generate code with test case input
+        let testCode = codeInput;
+        
+        // Parse the input and create appropriate function call
+        const input = testcase.input;
+        let functionCall = '';
+        
+        if (typeof input === 'object' && !Array.isArray(input)) {
+          // Object input (multiple parameters)
+          const params = Object.keys(input);
+          const args = params.map(p => JSON.stringify(input[p])).join(', ');
+          functionCall = `result = solution(${args})`;
+        } else if (Array.isArray(input)) {
+          functionCall = `result = solution(${JSON.stringify(input)})`;
+        } else if (typeof input === 'string') {
+          functionCall = `result = solution("${input}")`;
+        } else {
+          functionCall = `result = solution(${input})`;
+        }
+
+        // Replace the test code in boilerplate
+        testCode = testCode.replace(
+          /if __name__ == "__main__":[\s\S]*/,
+          `if __name__ == "__main__":\n    ${functionCall}\n    print(result)`
+        );
+
+        // Execute code
+        const response = await fetch('https://emkc.org/api/v2/piston/execute', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            language: 'python',
+            version: '3.10.0',
+            files: [{ name: 'main.py', content: testCode }],
+            stdin: '',
+            args: [],
+            compile_timeout: 10000,
+            run_timeout: 3000
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.run && data.run.code === 0 && !data.run.stderr) {
+          const actualOutput = data.run.stdout.trim();
+          const expectedOutput = String(testcase.output).trim();
+          
+          const normalizedActual = actualOutput.replace(/\s+/g, ' ');
+          const normalizedExpected = expectedOutput.replace(/\s+/g, ' ');
+
+          if (normalizedActual === normalizedExpected) {
+            // Test passed
+            setSubmitTestResults(prev => {
+              const updated = [...prev];
+              updated[i] = {
+                status: 'passed',
+                expected: expectedOutput,
+                actual: actualOutput,
+                error: null
+              };
+              return updated;
+            });
+          } else {
+            // Test failed
+            allPassed = false;
+            setSubmitTestResults(prev => {
+              const updated = [...prev];
+              updated[i] = {
+                status: 'failed',
+                expected: expectedOutput,
+                actual: actualOutput,
+                error: 'Output mismatch'
+              };
+              return updated;
+            });
+          }
+        } else {
+          // Execution error
+          allPassed = false;
+          setSubmitTestResults(prev => {
+            const updated = [...prev];
+            updated[i] = {
+              status: 'failed',
+              expected: String(testcase.output),
+              actual: data.run?.stderr || 'Execution error',
+              error: 'Runtime error'
+            };
+            return updated;
+          });
+        }
+      } catch (err) {
+        allPassed = false;
+        setSubmitTestResults(prev => {
+          const updated = [...prev];
+          updated[i] = {
+            status: 'failed',
+            expected: String(testcase.output),
+            actual: err.message,
+            error: 'Execution failed'
+          };
+          return updated;
+        });
+      }
+
+      // Small delay between tests for visual effect
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+
+    setIsSubmitting(false);
   };
 
   const handleLeave = () => {
@@ -223,7 +394,7 @@ const Battle = ({ user }) => {
         <div className="question-content">
           <section className="question-section">
             <h3>Problem Statement</h3>
-            <p>{question.statement}</p>
+            <p>{question.description}</p>
           </section>
 
           <section className="question-section">
@@ -269,10 +440,6 @@ const Battle = ({ user }) => {
             </div>
           </section>
 
-          <section className="question-section">
-            <h3>Explanation</h3>
-            <p>{question.explanation}</p>
-          </section>
         </div>
       </div>
 
@@ -291,18 +458,36 @@ const Battle = ({ user }) => {
         </div>
 
         <div className="code-editor">
-          <textarea
+          <CodeEditor
             value={codeInput}
             onChange={(e) => setCodeInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="// Write your code here..."
-            spellCheck="false"
           />
         </div>
 
         <div className="output-section">
           <div className="output-header">
-            <h4>Output</h4>
+            <div className="output-title-wrapper">
+              <h4>Output</h4>
+              {testResult === 'pass' && (
+                <span className="test-result-badge test-pass">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <circle cx="8" cy="8" r="7" fill="#00b8a3" />
+                    <path d="M4 8l2.5 2.5L12 5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  Passed
+                </span>
+              )}
+              {testResult === 'fail' && (
+                <span className="test-result-badge test-fail">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <circle cx="8" cy="8" r="7" fill="#ef476f" />
+                    <path d="M5 5l6 6M11 5l-6 6" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                  Failed
+                </span>
+              )}
+            </div>
             <div className="action-buttons">
               <button 
                 onClick={handleRunCode} 
@@ -324,6 +509,15 @@ const Battle = ({ user }) => {
           </div>
         </div>
       </div>
+
+      {/* Submit Modal */}
+      <SubmitModal
+        isOpen={showSubmitModal}
+        onClose={() => setShowSubmitModal(false)}
+        testResults={submitTestResults}
+        isRunning={isSubmitting}
+        allPassed={submitTestResults.length > 0 && submitTestResults.every(r => r.status === 'passed')}
+      />
     </div>
   );
 };
