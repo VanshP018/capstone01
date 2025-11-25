@@ -1,0 +1,98 @@
+.leave-notification {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 2000;
+  animation: slideInRight 0.4s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.leave-notification-content {
+  background: linear-gradient(135deg, #252526 0%, #1e1e1e 100%);
+  border: 1px solid #ef476f;
+  border-radius: 8px;
+  padding: 16px 20px;
+  box-shadow: 0 4px 20px rgba(239, 71, 111, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 300px;
+  position: relative;
+}
+
+.leave-icon {
+  font-size: 28px;
+  animation: wave 1s ease-in-out;
+}
+
+@keyframes wave {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-15deg); }
+  75% { transform: rotate(15deg); }
+}
+
+.leave-message {
+  flex: 1;
+  color: #d4d4d4;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.leave-message strong {
+  color: #ef476f;
+  font-weight: 700;
+}
+
+.close-notification {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  color: #888;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.close-notification:hover {
+  color: #d4d4d4;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .leave-notification {
+    top: 60px;
+    right: 10px;
+    left: 10px;
+  }
+
+  .leave-notification-content {
+    min-width: auto;
+    padding: 12px 16px;
+  }
+
+  .leave-icon {
+    font-size: 24px;
+  }
+
+  .leave-message {
+    font-size: 13px;
+  }
+}

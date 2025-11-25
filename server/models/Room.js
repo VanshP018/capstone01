@@ -26,6 +26,35 @@ const roomSchema = new mongoose.Schema({
     type: Number,
     default: null
   },
+  scores: {
+    type: Map,
+    of: Number,
+    default: {}
+  },
+  questionsCompleted: {
+    type: Number,
+    default: 0
+  },
+  sessionEnded: {
+    type: Boolean,
+    default: false
+  },
+  timerStartedAt: {
+    type: Date,
+    default: null
+  },
+  timerDuration: {
+    type: Number,
+    default: 1800000 // 30 minutes in milliseconds
+  },
+  recentLeave: {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    username: String,
+    timestamp: Date
+  },
   createdAt: {
     type: Date,
     default: Date.now,

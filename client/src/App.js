@@ -54,6 +54,28 @@ function App() {
     setIsSignUp(false);
   };
 
+  const refreshUser = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const response = await fetch('http://localhost:5001/api/auth/me', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        const updatedUser = data.user;
+        setCurrentUser(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      }
+    } catch (err) {
+      console.error('Error refreshing user:', err);
+    }
+  };
+
   const toggleAuthMode = () => {
     console.log('Toggling auth mode from', isSignUp, 'to', !isSignUp);
     setIsSignUp(!isSignUp);
@@ -106,7 +128,7 @@ function App() {
           path="/room/:code" 
           element={
             currentUser ? (
-              <Room user={currentUser} />
+              <Room user={currentUser} refreshUser={refreshUser} />
             ) : (
               <Navigate to="/" replace />
             )
@@ -126,7 +148,7 @@ function App() {
           path="/battle/:code" 
           element={
             currentUser ? (
-              <Battle user={currentUser} />
+              <Battle user={currentUser} refreshUser={refreshUser} />
             ) : (
               <Navigate to="/" replace />
             )

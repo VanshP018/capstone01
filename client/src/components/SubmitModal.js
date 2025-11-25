@@ -77,9 +77,7 @@ const SubmitModal = ({ isOpen, onClose, testResults, isRunning, allPassed }) => 
             </div>
             <h2 className="congrats-title">Congratulations! 🎉</h2>
             <p className="congrats-message">All test cases passed successfully!</p>
-            <button className="close-modal-btn" onClick={onClose}>
-              Continue
-            </button>
+            <p className="next-question-message">Loading next question...</p>
           </div>
         )}
 

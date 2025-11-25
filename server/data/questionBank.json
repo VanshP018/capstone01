@@ -13,15 +13,15 @@
       "output_format": "Return the sum of all missing integers.",
       "constraints": "1 <= n <= 100000",
       "sample_testcase": {
-        "input": { "n": 7, "nums": [1,2,4,6] },
-        "output": 13
+        "input": { "n": 7, "nums": [1, 2, 4, 6] },
+        "output": 15
       },
       "testcases": [
-        { "input": { "n": 5, "nums": [1,2,5] }, "output": 7 },
-        { "input": { "n": 10, "nums": [2,4,6,8,10] }, "output": 25 },
-        { "input": { "n": 6, "nums": [1,3,6] }, "output": 11 },
-        { "input": { "n": 4, "nums": [2,3,4] }, "output": 1 },
-        { "input": { "n": 12, "nums": [1,2,3,7,8,12] }, "output": 30 }
+        { "input": { "n": 5, "nums": [1, 2, 5] }, "output": 7 },
+        { "input": { "n": 10, "nums": [2, 4, 6, 8, 10] }, "output": 25 },
+        { "input": { "n": 6, "nums": [1, 3, 6] }, "output": 11 },
+        { "input": { "n": 4, "nums": [2, 3, 4] }, "output": 1 },
+        { "input": { "n": 12, "nums": [1, 2, 3, 7, 8, 12] }, "output": 45 }
       ]
     },
     {
@@ -38,10 +38,10 @@
         "output": 4
       },
       "testcases": [
-        { "input": "0011", "output": 4 },
+        { "input": "0011", "output": 2 },
         { "input": "010010", "output": 5 },
         { "input": "1111", "output": 0 },
-        { "input": "0110", "output": 4 },
+        { "input": "0110", "output": 3 },
         { "input": "010101", "output": 9 }
       ]
     },
@@ -55,15 +55,15 @@
       "output_format": "Return the smallest unique number.",
       "constraints": "1 <= nums.length <= 100000",
       "sample_testcase": {
-        "input": [4,3,2,3,4,6],
+        "input": [4, 3, 2, 3, 4, 6],
         "output": 2
       },
       "testcases": [
-        { "input": [1,1,2,2,3], "output": 3 },
-        { "input": [9,8,7], "output": 7 },
-        { "input": [5,5,5], "output": -1 },
-        { "input": [10,20,20,10,30], "output": 30 },
-        { "input": [4,1,2,1,2], "output": 4 }
+        { "input": [1, 1, 2, 2, 3], "output": 3 },
+        { "input": [9, 8, 7], "output": 7 },
+        { "input": [5, 5, 5], "output": -1 },
+        { "input": [10, 20, 20, 10, 30], "output": 30 },
+        { "input": [4, 1, 2, 1, 2], "output": 4 }
       ]
     },
     {
@@ -76,15 +76,15 @@
       "output_format": "Return the length of the longest increasing consecutive subarray.",
       "constraints": "1 <= nums.length <= 100000",
       "sample_testcase": {
-        "input": [1,2,3,2,3,4,5],
+        "input": [1, 2, 3, 2, 3, 4, 5],
         "output": 4
       },
       "testcases": [
-        { "input": [5,6,7,8], "output": 4 },
-        { "input": [3,2,1], "output": 1 },
-        { "input": [1,2,1,2,3], "output": 3 },
+        { "input": [5, 6, 7, 8], "output": 4 },
+        { "input": [3, 2, 1], "output": 1 },
+        { "input": [1, 2, 1, 2, 3], "output": 3 },
         { "input": [10], "output": 1 },
-        { "input": [1,3,5,4,6,8,9], "output": 4 }
+        { "input": [1, 3, 5, 4, 6, 8, 9], "output": 4 }
       ]
     },
     {
@@ -105,7 +105,7 @@
         { "input": 50, "output": false },
         { "input": 144, "output": true },
         { "input": 200, "output": false },
-        { "input": 1024, "output": false }
+        { "input": 1024, "output": true }
       ]
     },
     {
@@ -118,15 +118,15 @@
       "output_format": "Return the closest pair [a, b].",
       "constraints": "2 <= nums.length <= 100000",
       "sample_testcase": {
-        "input": { "nums": [-1,2,4,7], "target": 5 },
-        "output": [2,4]
+        "input": { "nums": [-1, 2, 4, 7], "target": 5 },
+        "output": [-1, 7]
       },
       "testcases": [
-        { "input": { "nums":[1,4,6,8], "target":10 }, "output":[4,6] },
-        { "input": { "nums":[-5,-2,3,9], "target":1 }, "output":[-2,3] },
-        { "input": { "nums":[2,5,11,15], "target":12 }, "output":[5,11] },
-        { "input": { "nums":[1,1,1,1], "target":3 }, "output":[1,1] },
-        { "input": { "nums":[0,2,4,9], "target":8 }, "output":[4,4] }
+        { "input": { "nums": [1, 4, 6, 8], "target": 10 }, "output": [4, 6] },
+        { "input": { "nums": [-5, -2, 3, 9], "target": 1 }, "output": [-2, 3] },
+        { "input": { "nums": [2, 5, 11, 15], "target": 12 }, "output": [2, 11] },
+        { "input": { "nums": [1, 1, 1, 1], "target": 3 }, "output": [1, 1] },
+        { "input": { "nums": [0, 2, 4, 9], "target": 8 }, "output": [0, 9] }
       ]
     },
     {
@@ -139,14 +139,14 @@
       "output_format": "Return the maximum alternating length.",
       "constraints": "1 <= nums.length <= 100000",
       "sample_testcase": {
-        "input": [3,2,5,8,7],
+        "input": [3, 2, 5, 8, 7],
         "output": 5
       },
       "testcases": [
-        { "input": [1,2,3,4,5], "output": 5 },
-        { "input": [2,4,6], "output": 1 },
-        { "input": [1,3,5,2,4], "output": 2 },
-        { "input": [7,10,13,16], "output": 4 },
+        { "input": [1, 2, 3, 4, 5], "output": 5 },
+        { "input": [2, 4, 6], "output": 1 },
+        { "input": [1, 3, 5, 2, 4], "output": 2 },
+        { "input": [7, 10, 13, 16], "output": 4 },
         { "input": [5], "output": 1 }
       ]
     },
@@ -160,14 +160,14 @@
       "output_format": "Return the number of islands.",
       "constraints": "1 <= rows, cols <= 1000",
       "sample_testcase": {
-        "input": [[1,1,0],[0,1,0],[1,0,1]],
+        "input": [[1, 1, 0], [0, 1, 0], [1, 0, 1]],
         "output": 3
       },
       "testcases": [
-        { "input": [[1,0,0],[0,1,1],[1,1,0]], "output": 2 },
-        { "input": [[0,0],[0,0]], "output": 0 },
-        { "input": [[1,1],[1,1]], "output": 1 },
-        { "input": [[1,0,1],[0,1,0],[1,0,1]], "output": 5 },
+        { "input": [[1, 0, 0], [0, 1, 1], [1, 1, 0]], "output": 2 },
+        { "input": [[0, 0], [0, 0]], "output": 0 },
+        { "input": [[1, 1], [1, 1]], "output": 1 },
+        { "input": [[1, 0, 1], [0, 1, 0], [1, 0, 1]], "output": 5 },
         { "input": [[1]], "output": 1 }
       ]
     },
@@ -181,15 +181,15 @@
       "output_format": "Minimum jumps required.",
       "constraints": "1 <= nums.length <= 100000",
       "sample_testcase": {
-        "input": [2,3,1,1,4],
+        "input": [2, 3, 1, 1, 4],
         "output": 2
       },
       "testcases": [
-        { "input": [1,2,1,1,1], "output": 3 },
-        { "input": [3,2,1,0,4], "output": -1 },
-        { "input": [1,1,1,1], "output": 3 },
-        { "input": [5,1,1,1,1], "output": 1 },
-        { "input": [2,1], "output": 1 }
+        { "input": [1, 2, 1, 1, 1], "output": 3 },
+        { "input": [3, 2, 1, 0, 4], "output": -1 },
+        { "input": [1, 1, 1, 1], "output": 3 },
+        { "input": [5, 1, 1, 1, 1], "output": 1 },
+        { "input": [2, 1], "output": 1 }
       ]
     },
     {
@@ -202,15 +202,15 @@
       "output_format": "List of averages of each level.",
       "constraints": "1 <= nodes <= 100000",
       "sample_testcase": {
-        "input": [3,9,20,null,null,15,7],
-        "output": [3,14.5,11]
+        "input": [3, 9, 20, null, null, 15, 7],
+        "output": [3, 14.5, 11]
       },
       "testcases": [
-        { "input": [1,2,3], "output": [1,2.5] },
-        { "input": [5,3,8,1,4], "output": [5,5.5,2.5] },
+        { "input": [1, 2, 3], "output": [1, 2.5] },
+        { "input": [5, 3, 8, 1, 4], "output": [5, 5.5, 2.5] },
         { "input": [7], "output": [7] },
-        { "input": [10,20,30,40,null,null,50], "output": [10,25,45] },
-        { "input": [4,2,6,1,3,5,7], "output": [4,4,4] }
+        { "input": [10, 20, 30, 40, null, null, 50], "output": [10, 25, 45] },
+        { "input": [4, 2, 6, 1, 3, 5, 7], "output": [4, 4, 4] }
       ]
     },
     {
@@ -223,15 +223,15 @@
       "output_format": "Return the maximum sum.",
       "constraints": "1 <= nums.length <= 2000",
       "sample_testcase": {
-        "input": [1,101,2,3,100],
+        "input": [1, 101, 2, 3, 100],
         "output": 106
       },
       "testcases": [
-        { "input": [10,5,4,3], "output": 10 },
-        { "input": [4,6,1,3,8], "output": 18 },
-        { "input": [1,2,3], "output": 6 },
-        { "input": [9,1,2,3,7], "output": 12 },
-        { "input": [5,5,5], "output": 5 }
+        { "input": [10, 5, 4, 3], "output": 10 },
+        { "input": [4, 6, 1, 3, 8], "output": 18 },
+        { "input": [1, 2, 3], "output": 6 },
+        { "input": [9, 1, 2, 3, 7], "output": 13 },
+        { "input": [5, 5, 5], "output": 5 }
       ]
     },
     {
@@ -250,17 +250,17 @@
       "sample_testcase": {
         "input": {
           "n": 5,
-          "edges": [[0,1,2],[1,2,3],[0,3,6]],
+          "edges": [[0, 1, 2], [1, 2, 3], [0, 3, 6]],
           "source": 0
         },
-        "output": [0,2,5,6,-1]
+        "output": [0, 2, 5, 6, -1]
       },
       "testcases": [
-        { "input": { "n":3,"edges":[[0,1,4],[1,2,5]],"source":0 }, "output":[0,4,9] },
-        { "input": { "n":4,"edges":[[0,1,1],[1,2,2],[2,3,3]],"source":0 }, "output":[0,1,3,6] },
-        { "input": { "n":3,"edges":[[1,2,7]],"source":0 }, "output":[0,-1,-1] },
-        { "input": { "n":5,"edges":[[0,4,10],[4,3,2]],"source":0 }, "output":[0,-1,-1,12,10] },
-        { "input": { "n":2,"edges":[],"source":1 }, "output":[-1,0] }
+        { "input": { "n": 3, "edges": [[0, 1, 4], [1, 2, 5]], "source": 0 }, "output": [0, 4, 9] },
+        { "input": { "n": 4, "edges": [[0, 1, 1], [1, 2, 2], [2, 3, 3]], "source": 0 }, "output": [0, 1, 3, 6] },
+        { "input": { "n": 3, "edges": [[1, 2, 7]], "source": 0 }, "output": [0, -1, -1] },
+        { "input": { "n": 5, "edges": [[0, 4, 10], [4, 3, 2]], "source": 0 }, "output": [0, -1, -1, 12, 10] },
+        { "input": { "n": 2, "edges": [], "source": 1 }, "output": [-1, 0] }
       ]
     },
     {
@@ -273,15 +273,15 @@
       "output_format": "Return longest path length.",
       "constraints": "1 <= nodes <= 100000",
       "sample_testcase": {
-        "input": [1,2,3,4,5],
+        "input": [1, 2, 3, 4, 5],
         "output": 3
       },
       "testcases": [
         { "input": [1], "output": 0 },
-        { "input": [1,2,null,3], "output": 2 },
-        { "input": [1,2,3,4,null,null,5], "output": 3 },
-        { "input": [5,4,8,11,null,13,4], "output": 4 },
-        { "input": [2,1,3], "output": 2 }
+        { "input": [1, 2, "None", 3], "output": 2 },
+        { "input": [1, 2, 3, 4, "None", "None", 5], "output": 4 },
+        { "input": [5, 4, 8, 11, "None", 13, 4], "output": 4 },
+        { "input": [2, 1, 3], "output": 2 }
       ]
     },
     {
@@ -294,15 +294,15 @@
       "output_format": "Return the number of valid subarrays.",
       "constraints": "1 <= nums.length <= 100000",
       "sample_testcase": {
-        "input": { "nums": [10,5,2,6], "k": 100 },
+        "input": { "nums": [10, 5, 2, 6], "k": 100 },
         "output": 8
       },
       "testcases": [
-        { "input": { "nums":[1,2,3], "k":0 }, "output": 0 },
-        { "input": { "nums":[1,1,1], "k":2 }, "output": 6 },
-        { "input": { "nums":[2,3,4,5], "k":50 }, "output": 7 },
-        { "input": { "nums":[5,2,1,4], "k":20 }, "output": 6 },
-        { "input": { "nums":[1], "k":2 }, "output": 1 }
+        { "input": { "nums": [1, 2, 3], "k": 0 }, "output": 0 },
+        { "input": { "nums": [1, 1, 1], "k": 2 }, "output": 6 },
+        { "input": { "nums": [2, 3, 4, 5], "k": 50 }, "output": 8 },
+        { "input": { "nums": [5, 2, 1, 4], "k": 20 }, "output": 9 },
+        { "input": { "nums": [1], "k": 2 }, "output": 1 }
       ]
     },
     {
@@ -315,15 +315,15 @@
       "output_format": "Minimum largest sum achievable.",
       "constraints": "1 <= nums.length <= 100000",
       "sample_testcase": {
-        "input": { "nums":[7,2,5,10,8], "m":2 },
+        "input": { "nums": [7, 2, 5, 10, 8], "m": 2 },
         "output": 18
       },
       "testcases": [
-        { "input": { "nums":[1,2,3,4,5], "m":2 }, "output": 9 },
-        { "input": { "nums":[1,4,4], "m":3 }, "output": 4 },
-        { "input": { "nums":[10,20,30], "m":1 }, "output": 60 },
-        { "input": { "nums":[2,3,1,2,4], "m":2 }, "output": 6 },
-        { "input": { "nums":[1], "m":1 }, "output": 1 }
+        { "input": { "nums": [1, 2, 3, 4, 5], "m": 2 }, "output": 9 },
+        { "input": { "nums": [1, 4, 4], "m": 3 }, "output": 4 },
+        { "input": { "nums": [10, 20, 30], "m": 1 }, "output": 60 },
+        { "input": { "nums": [2, 3, 1, 2, 4], "m": 2 }, "output": 6 },
+        { "input": { "nums": [1], "m": 1 }, "output": 1 }
       ]
     },
     {
@@ -336,15 +336,15 @@
       "output_format": "true/false",
       "constraints": "1 <= nodes <= 100000",
       "sample_testcase": {
-        "input": [[1,3],[0,2],[1,3],[0,2]],
+        "input": [[1, 3], [0, 2], [1, 3], [0, 2]],
         "output": true
       },
       "testcases": [
-        { "input": [[1],[0]], "output": true },
-        { "input": [[1],[0,2],[1]], "output": false },
-        { "input": [[],[2],[],[4],[]], "output": true },
-        { "input": [[1,2],[0,2],[0]], "output": true },
-        { "input": [[1,2],[0,2],[0,1]], "output": false }
+        { "input": [[1], [0]], "output": true },
+        { "input": [[1], [0, 2], [1]], "output": true },
+        { "input": [[], [2], [], [4], []], "output": true },
+        { "input": [[1, 2], [0, 2], [0]], "output": false },
+        { "input": [[1, 2], [0, 2], [0, 1]], "output": false }
       ]
     },
     {
@@ -357,15 +357,15 @@
       "output_format": "Return minimum cost.",
       "constraints": "1 <= cost.length <= 100000",
       "sample_testcase": {
-        "input": [10,15,20],
+        "input": [10, 15, 20],
         "output": 15
       },
       "testcases": [
-        { "input": [1,100,1], "output": 2 },
-        { "input": [0,0,0], "output": 0 },
-        { "input": [5,6], "output": 5 },
-        { "input": [3,4,5,6], "output": 9 },
-        { "input": [2,2,2,2], "output": 4 }
+        { "input": [1, 100, 1], "output": 2 },
+        { "input": [0, 0, 0], "output": 0 },
+        { "input": [5, 6], "output": 5 },
+        { "input": [3, 4, 5, 6], "output": 8 },
+        { "input": [2, 2, 2, 2], "output": 4 }
       ]
     },
     {
@@ -378,15 +378,15 @@
       "output_format": "true/false",
       "constraints": "1 <= nodes <= 2000",
       "sample_testcase": {
-        "input": { "root":[1,2,3], "preorder":[1,3,2] },
+        "input": { "root": [1, 2, 3], "preorder": [1, 3, 2] },
         "output": true
       },
       "testcases": [
-        { "input": { "root":[1], "preorder":[1] }, "output": true },
-        { "input": { "root":[1,2,3], "preorder":[1,2,3] }, "output": true },
-        { "input": { "root":[1,2,3], "preorder":[1,3,4] }, "output": false },
-        { "input": { "root":[2,1,3], "preorder":[2,3,1] }, "output": true },
-        { "input": { "root":[5,3,8], "preorder":[5,8,3] }, "output": true }
+        { "input": { "root": [1], "preorder": [1] }, "output": true },
+        { "input": { "root": [1, 2, 3], "preorder": [1, 2, 3] }, "output": true },
+        { "input": { "root": [1, 2, 3], "preorder": [1, 3, 4] }, "output": false },
+        { "input": { "root": [2, 1, 3], "preorder": [2, 3, 1] }, "output": true },
+        { "input": { "root": [5, 3, 8], "preorder": [5, 8, 3] }, "output": true }
       ]
     },
     {
@@ -399,15 +399,15 @@
       "output_format": "Maximum possible frequency.",
       "constraints": "1 <= nums.length <= 100000",
       "sample_testcase": {
-        "input": { "nums":[1,2,4], "k":5 },
+        "input": { "nums": [1, 2, 4], "k": 5 },
         "output": 3
       },
       "testcases": [
-        { "input": { "nums":[1,1,1], "k":2 }, "output": 3 },
-        { "input": { "nums":[1,4,8,13], "k":5 }, "output": 2 },
-        { "input": { "nums":[3,9,6], "k":2 }, "output": 1 },
-        { "input": { "nums":[2,2,2,2], "k":10 }, "output": 4 },
-        { "input": { "nums":[1,2,3,4], "k":3 }, "output": 2 }
+        { "input": { "nums": [1, 1, 1], "k": 2 }, "output": 3 },
+        { "input": { "nums": [1, 4, 8, 13], "k": 5 }, "output": 2 },
+        { "input": { "nums": [3, 9, 6], "k": 2 }, "output": 1 },
+        { "input": { "nums": [2, 2, 2, 2], "k": 10 }, "output": 4 },
+        { "input": { "nums": [1, 2, 3, 4], "k": 3 }, "output": 3 }
       ]
     },
     {
@@ -420,16 +420,17 @@
       "output_format": "Return the longest path length.",
       "constraints": "1 <= n <= 100000",
       "sample_testcase": {
-        "input": { "n":5, "edges":[[0,1],[1,2],[0,3],[3,4]] },
-        "output": 3
+        "input": { "n": 5, "edges": [[0, 1], [1, 2], [0, 3], [3, 4]] },
+        "output": 2
       },
       "testcases": [
-        { "input": { "n":4, "edges":[[0,1],[1,2],[2,3]] }, "output": 3 },
-        { "input": { "n":3, "edges":[[0,1],[0,2]] }, "output": 1 },
-        { "input": { "n":5, "edges":[[1,2],[2,3],[3,4]] }, "output": 3 },
-        { "input": { "n":4, "edges":[] }, "output": 0 },
-        { "input": { "n":6, "edges":[[0,2],[2,4],[4,5]] }, "output": 3 }
+        { "input": { "n": 4, "edges": [[0, 1], [1, 2], [2, 3]] }, "output": 3 },
+        { "input": { "n": 3, "edges": [[0, 1], [0, 2]] }, "output": 1 },
+        { "input": { "n": 5, "edges": [[1, 2], [2, 3], [3, 4]] }, "output": 3 },
+        { "input": { "n": 4, "edges": [] }, "output": 0 },
+        { "input": { "n": 6, "edges": [[0, 2], [2, 4], [4, 5]] }, "output": 3 }
       ]
     }
   ]
 }
+

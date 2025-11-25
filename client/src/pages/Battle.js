@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { generateBoilerplate } from '../utils/boilerplateGenerator';
 import CodeEditor from '../components/CodeEditor';
 import SubmitModal from '../components/SubmitModal';
+import FinalScoreboard from '../components/FinalScoreboard';
+import Timer from '../components/Timer';
+import LeaveNotification from '../components/LeaveNotification';
 import './Battle.css';
 
-const Battle = ({ user }) => {
+const Battle = ({ user, refreshUser }) => {
   const { code } = useParams();
   const navigate = useNavigate();
   const [question, setQuestion] = useState(null);
@@ -15,11 +18,31 @@ const Battle = ({ user }) => {
   const [error, setError] = useState('');
   const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
-  const [boilerplateSet, setBoilerplateSet] = useState(false); // Track if boilerplate is already set
   const [testResult, setTestResult] = useState(null); // 'pass', 'fail', or null
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [submitTestResults, setSubmitTestResults] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [questionChanging, setQuestionChanging] = useState(false);
+  const [previousQuestionId, setPreviousQuestionId] = useState(null);
+  const [scores, setScores] = useState({});
+  const [participants, setParticipants] = useState([]);
+  const hasUserEditedCode = useRef(false);
+  const lastSetQuestionId = useRef(null);
+  const [questionsCompleted, setQuestionsCompleted] = useState(0);
+  const [sessionEnded, setSessionEnded] = useState(false);
+  const [showFinalScoreboard, setShowFinalScoreboard] = useState(false);
+  const [timerStartedAt, setTimerStartedAt] = useState(null);
+  const [timerDuration, setTimerDuration] = useState(1800000); // 30 minutes
+  const [timeExpired, setTimeExpired] = useState(false);
+  const [leaveNotification, setLeaveNotification] = useState(null);
+  const lastLeaveTimestamp = useRef(null);
+
+  // Refresh user data when component mounts (for participants entering battle)
+  useEffect(() => {
+    if (refreshUser) {
+      refreshUser();
+    }
+  }, [refreshUser]);
 
   useEffect(() => {
     const fetchBattleQuestion = async () => {
@@ -44,6 +67,40 @@ const Battle = ({ user }) => {
         // Check if battle started and has questionId
         const room = roomData.room;
         
+        // Update scores and participants
+        if (room.scores) {
+          setScores(room.scores);
+        }
+        if (room.participants) {
+          setParticipants(room.participants);
+        }
+        if (room.questionsCompleted !== undefined) {
+          setQuestionsCompleted(room.questionsCompleted);
+        }
+        if (room.timerStartedAt) {
+          setTimerStartedAt(room.timerStartedAt);
+        }
+        if (room.timerDuration) {
+          setTimerDuration(room.timerDuration);
+        }
+        if (room.sessionEnded && !showFinalScoreboard) {
+          setSessionEnded(true);
+          setShowFinalScoreboard(true);
+        }
+
+        // Check for recent leave notification
+        if (room.recentLeave && room.recentLeave.timestamp) {
+          const leaveTime = new Date(room.recentLeave.timestamp).getTime();
+          // Only show notification if it's new (not shown before)
+          if (lastLeaveTimestamp.current !== leaveTime) {
+            lastLeaveTimestamp.current = leaveTime;
+            setLeaveNotification({
+              username: room.recentLeave.username,
+              timestamp: leaveTime
+            });
+          }
+        }
+        
         if (!room.battleStarted || !room.questionId) {
           setError('Battle not started yet');
           setLoading(false);
@@ -59,13 +116,30 @@ const Battle = ({ user }) => {
         );
 
         if (selectedQuestion) {
+          // Check if question has changed using ref for reliability
+          const questionChanged = lastSetQuestionId.current !== null && lastSetQuestionId.current !== room.questionId;
+          const isInitialLoad = lastSetQuestionId.current === null;
+          
+          console.log('[Polling] Room Question ID:', room.questionId, 'Last Set:', lastSetQuestionId.current, 'Changed:', questionChanged, 'Initial:', isInitialLoad);
+          
+          if (questionChanged) {
+            console.log('Question changed from', lastSetQuestionId.current, 'to', room.questionId);
+          }
+          
           setQuestion(selectedQuestion);
-          // Only set boilerplate once on initial load
-          if (!boilerplateSet) {
+          
+          // Set boilerplate ONLY on initial load OR when question changes
+          if (isInitialLoad || questionChanged) {
+            console.log('Setting boilerplate for question ID:', room.questionId);
             const boilerplate = generateBoilerplate(selectedQuestion);
             setCodeInput(boilerplate);
-            setBoilerplateSet(true);
+            lastSetQuestionId.current = room.questionId; // Store in ref
+            setPreviousQuestionId(room.questionId);
+            setOutput('');
+            setTestResult(null);
+            hasUserEditedCode.current = false; // Reset edit flag for new question
           }
+          
           setError('');
         } else {
           setError('Question not found');
@@ -83,7 +157,7 @@ const Battle = ({ user }) => {
     // Poll for updates every 2 seconds
     const interval = setInterval(fetchBattleQuestion, 2000);
     return () => clearInterval(interval);
-  }, [code, boilerplateSet]);
+  }, [code]); // Only depend on code, not on state that changes internally
 
   const handleRunCode = async () => {
     if (!codeInput.trim()) {
@@ -316,10 +390,99 @@ const Battle = ({ user }) => {
     }
 
     setIsSubmitting(false);
+
+    // If all tests passed, notify backend to change question
+    if (allPassed) {
+      console.log('All tests passed! Notifying backend to change question...');
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:5001/api/rooms/submit/${code}`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ allPassed: true })
+        });
+
+        const data = await response.json();
+        console.log('Submit response:', data);
+        
+        // Check if time expired during submission
+        if (data.timeExpired) {
+          console.log('Time expired! Showing final scoreboard');
+          setTimeout(() => {
+            setShowSubmitModal(false);
+            setTimeExpired(true);
+            setSessionEnded(true);
+            setShowFinalScoreboard(true);
+          }, 2000);
+          return;
+        }
+        
+        if (data.success) {
+          // Update questions completed count immediately
+          if (data.questionsCompleted !== undefined) {
+            setQuestionsCompleted(data.questionsCompleted);
+          }
+          
+          if (data.sessionEnded) {
+            // Session ended after 3 questions
+            console.log('Session ended! Showing final scoreboard');
+            setTimeout(() => {
+              setShowSubmitModal(false);
+              setSessionEnded(true);
+              setShowFinalScoreboard(true);
+            }, 3000);
+          } else if (data.questionChanged) {
+            console.log('Question changed to:', data.newQuestionId);
+            // Wait 3 seconds before closing modal and refreshing
+            setTimeout(() => {
+              setShowSubmitModal(false);
+              setQuestionChanging(true);
+              
+              // Clear the question changing message after 2 seconds
+              setTimeout(() => {
+                setQuestionChanging(false);
+              }, 2000);
+            }, 3000);
+          }
+        } else {
+          console.log('Question not changed or no more questions available');
+        }
+      } catch (err) {
+        console.error('Error submitting solution:', err);
+      }
+    }
   };
 
-  const handleLeave = () => {
-    navigate(`/room/${code}`);
+  const handleLeave = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5001/api/rooms/leave/${code}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ inBattle: true })
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        // Navigate to dashboard
+        navigate('/dashboard');
+      } else {
+        console.error('Failed to leave room:', data.message);
+        // Still navigate even if there's an error
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      console.error('Error leaving battle:', err);
+      // Still navigate even if there's an error
+      navigate('/dashboard');
+    }
   };
 
   const handleKeyDown = (e) => {
@@ -338,6 +501,13 @@ const Battle = ({ user }) => {
         e.target.selectionStart = e.target.selectionEnd = start + 4;
       }, 0);
     }
+  };
+
+  const handleTimeExpired = () => {
+    console.log('[Timer] Time expired!');
+    setTimeExpired(true);
+    setSessionEnded(true);
+    setShowFinalScoreboard(true);
   };
 
   if (loading) {
@@ -375,14 +545,42 @@ const Battle = ({ user }) => {
 
   return (
     <div className="battle-page">
+      {/* Leave Notification */}
+      {leaveNotification && (
+        <LeaveNotification
+          username={leaveNotification.username}
+          onClose={() => setLeaveNotification(null)}
+        />
+      )}
+
+      {/* Question Changing Overlay */}
+      {questionChanging && (
+        <div className="question-changing-overlay">
+          <div className="changing-content">
+            <div className="spinner-large"></div>
+            <h2>Loading Next Question...</h2>
+            <p>All participants are moving to a new challenge!</p>
+          </div>
+        </div>
+      )}
+
       {/* Question Panel - Left Side */}
       <div className="question-panel">
         <div className="question-header">
           <div className="question-title-row">
             <h2>{question.title}</h2>
-            <span className={`difficulty-badge ${question.difficulty.toLowerCase()}`}>
-              {question.difficulty}
-            </span>
+            <div className="title-right-section">
+              {timerStartedAt && !sessionEnded && (
+                <Timer 
+                  timerStartedAt={timerStartedAt}
+                  timerDuration={timerDuration}
+                  onTimeExpired={handleTimeExpired}
+                />
+              )}
+              <span className={`difficulty-badge ${question.difficulty.toLowerCase()}`}>
+                {question.difficulty}
+              </span>
+            </div>
           </div>
           <div className="question-tags">
             {question.tags.map((tag, index) => (
@@ -451,6 +649,14 @@ const Battle = ({ user }) => {
               <span className="language-badge">🐍 Python 3.10</span>
               <span className="status-text">Real-time execution enabled</span>
             </div>
+            <div className="progress-indicator">
+              <span className="progress-label">Question</span>
+              <span className="progress-value">{questionsCompleted + 1}/3</span>
+            </div>
+            <div className="user-score">
+              <span className="score-label">Your Score:</span>
+              <span className="score-value">{user && scores[user.id || user._id] ? scores[user.id || user._id] : 0}</span>
+            </div>
             <button onClick={handleLeave} className="leave-battle-btn">
               ← Leave Battle
             </button>
@@ -460,7 +666,10 @@ const Battle = ({ user }) => {
         <div className="code-editor">
           <CodeEditor
             value={codeInput}
-            onChange={(e) => setCodeInput(e.target.value)}
+            onChange={(e) => {
+              setCodeInput(e.target.value);
+              hasUserEditedCode.current = true;
+            }}
             onKeyDown={handleKeyDown}
           />
         </div>
@@ -517,6 +726,18 @@ const Battle = ({ user }) => {
         testResults={submitTestResults}
         isRunning={isSubmitting}
         allPassed={submitTestResults.length > 0 && submitTestResults.every(r => r.status === 'passed')}
+      />
+
+      <FinalScoreboard
+        isOpen={showFinalScoreboard}
+        participants={participants}
+        scores={scores}
+        timeExpired={timeExpired}
+        questionsCompleted={questionsCompleted}
+        onClose={() => {
+          setShowFinalScoreboard(false);
+          navigate('/dashboard');
+        }}
       />
     </div>
   );

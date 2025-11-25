@@ -31,6 +31,13 @@
   margin: 0;
   font-size: 24px;
   color: #fff;
+  flex: 1;
+}
+
+.title-right-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .difficulty-badge {
@@ -233,6 +240,63 @@
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
+}
+
+/* Question Progress Indicator */
+.progress-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #252526 0%, #1e1e1e 100%);
+  border-radius: 8px;
+  border: 1px solid #569cd6;
+  box-shadow: 0 2px 8px rgba(86, 156, 214, 0.2);
+}
+
+.progress-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #d4d4d4;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.progress-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #569cd6;
+  min-width: 40px;
+  text-align: center;
+}
+
+/* User Score Display */
+.user-score {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #252526 0%, #1e1e1e 100%);
+  border-radius: 8px;
+  border: 1px solid #ffd43b;
+  box-shadow: 0 2px 8px rgba(255, 212, 59, 0.2);
+}
+
+.score-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #d4d4d4;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.score-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffd43b;
+  min-width: 30px;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(255, 212, 59, 0.5);
 }
 
 .leave-battle-btn {
@@ -469,4 +533,63 @@
 .question-content::-webkit-scrollbar-thumb:hover,
 .output-content::-webkit-scrollbar-thumb:hover {
   background: #4e4e4e;
+}
+
+/* Question Changing Overlay */
+.question-changing-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.changing-content {
+  text-align: center;
+  animation: slideUp 0.5s ease-out;
+}
+
+.changing-content h2 {
+  color: #fff;
+  font-size: 28px;
+  margin: 24px 0 12px 0;
+}
+
+.changing-content p {
+  color: #00b8a3;
+  font-size: 16px;
+  margin: 0;
+}
+
+.spinner-large {
+  width: 60px;
+  height: 60px;
+  border: 6px solid #333;
+  border-top-color: #00b8a3;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

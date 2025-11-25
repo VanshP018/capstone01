@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import roomService from '../services/roomService';
 import './Room.css';
 
-const Room = ({ user }) => {
+const Room = ({ user, refreshUser }) => {
   const { code } = useParams();
   const navigate = useNavigate();
   const [room, setRoom] = useState(null);
@@ -89,6 +89,10 @@ const Room = ({ user }) => {
       const data = await response.json();
 
       if (data.success) {
+        // Refresh user data to update battlesFought count
+        if (refreshUser) {
+          await refreshUser();
+        }
         // Navigate to battle page
         navigate(`/battle/${code}`);
       } else {
