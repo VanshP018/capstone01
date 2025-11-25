@@ -5,6 +5,7 @@ import Login from './components/Login';
 import Dashboard from './pages/Dashboard';
 import Room from './pages/Room';
 import Leaderboard from './pages/Leaderboard';
+import Battle from './pages/Battle';
 import './App.css';
 
 function App() {
@@ -116,6 +117,16 @@ function App() {
           element={
             currentUser ? (
               <Leaderboard user={currentUser} onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          } 
+        />
+        <Route 
+          path="/battle/:code" 
+          element={
+            currentUser ? (
+              <Battle user={currentUser} />
             ) : (
               <Navigate to="/" replace />
             )

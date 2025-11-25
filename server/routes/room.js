@@ -164,7 +164,9 @@ router.get('/:code', protect, async (req, res) => {
         id: room._id,
         code: room.code,
         createdBy: room.createdBy,
-        participants: room.participants
+        participants: room.participants,
+        battleStarted: room.battleStarted,
+        questionId: room.questionId
       }
     });
   } catch (error) {
@@ -189,6 +191,55 @@ router.get('/user/my-rooms', protect, async (req, res) => {
         createdBy: room.createdBy,
         participantCount: room.participants.length
       }))
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// @route POST /api/rooms/start/:code
+// @desc Start battle and assign random question
+// @access Private (Host only)
+router.post('/start/:code', protect, async (req, res) => {
+  try {
+    const { code } = req.params;
+    const fs = require('fs');
+    const path = require('path');
+
+    // Find room
+    const room = await Room.findOne({ code });
+
+    if (!room) {
+      return res.status(404).json({ success: false, message: 'Room not found' });
+    }
+
+    // Check if user is the host
+    if (room.createdBy.toString() !== req.userId.toString()) {
+      return res.status(403).json({ success: false, message: 'Only host can start the battle' });
+    }
+
+    // Check if battle already started
+    if (room.battleStarted) {
+      return res.status(400).json({ success: false, message: 'Battle already started' });
+    }
+
+    // Load question bank
+    const questionBankPath = path.join(__dirname, '../data/questionBank.json');
+    const questionBank = JSON.parse(fs.readFileSync(questionBankPath, 'utf8'));
+
+    // Select random question
+    const randomIndex = Math.floor(Math.random() * questionBank.questions.length);
+    const selectedQuestion = questionBank.questions[randomIndex];
+
+    // Update room
+    room.battleStarted = true;
+    room.questionId = selectedQuestion.id;
+    await room.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Battle started',
+      questionId: selectedQuestion.id
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

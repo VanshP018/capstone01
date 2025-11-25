@@ -18,6 +18,14 @@ const roomSchema = new mongoose.Schema({
       ref: 'User'
     }
   ],
+  battleStarted: {
+    type: Boolean,
+    default: false
+  },
+  questionId: {
+    type: Number,
+    default: null
+  },
   createdAt: {
     type: Date,
     default: Date.now,

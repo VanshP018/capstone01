@@ -79,6 +79,13 @@ const CreateRoomModal = ({ user, onClose, navigate }) => {
 
     try {
       const token = localStorage.getItem('token');
+      
+      if (!token) {
+        setError('Please log in again');
+        setLoading(false);
+        return;
+      }
+
       const response = await fetch('http://localhost:5001/api/rooms/create', {
         method: 'POST',
         headers: {
@@ -93,7 +100,11 @@ const CreateRoomModal = ({ user, onClose, navigate }) => {
         // Navigate to room page immediately
         navigate(`/room/${data.room.code}`);
       } else {
-        setError(data.message || 'Failed to create room');
+        if (data.message === 'Not authorized to access this route') {
+          setError('Session expired. Please log out and log back in.');
+        } else {
+          setError(data.message || 'Failed to create room');
+        }
       }
     } catch (err) {
       setError('Error creating room: ' + err.message);
@@ -148,6 +159,13 @@ const JoinRoomModal = ({ user, onClose, navigate }) => {
 
     try {
       const token = localStorage.getItem('token');
+      
+      if (!token) {
+        setError('Please log in again');
+        setLoading(false);
+        return;
+      }
+
       const response = await fetch('http://localhost:5001/api/rooms/join', {
         method: 'POST',
         headers: {
@@ -163,7 +181,11 @@ const JoinRoomModal = ({ user, onClose, navigate }) => {
         // Navigate to room page
         navigate(`/room/${roomCode}`);
       } else {
-        setError(data.message || 'Failed to join room');
+        if (data.message === 'Not authorized to access this route') {
+          setError('Session expired. Please log out and log back in.');
+        } else {
+          setError(data.message || 'Failed to join room');
+        }
       }
     } catch (err) {
       setError('Error joining room: ' + err.message);

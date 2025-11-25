@@ -27,6 +27,11 @@ const Room = ({ user }) => {
       if (data.success) {
         setRoom(data.room);
         setError('');
+        
+        // If battle has started, redirect to battle page
+        if (data.room.battleStarted && data.room.questionId) {
+          navigate(`/battle/${code}`);
+        }
       } else {
         setError(data.message || 'Failed to load room details');
       }
@@ -73,11 +78,25 @@ const Room = ({ user }) => {
   const handleStartBattle = async () => {
     setIsStarting(true);
     try {
-      // TODO: Implement start battle logic
-      console.log('Starting battle...');
-      alert('Starting battle!');
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5001/api/rooms/start/${code}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Navigate to battle page
+        navigate(`/battle/${code}`);
+      } else {
+        alert('Failed to start battle: ' + data.message);
+      }
     } catch (err) {
       console.error('Error starting battle:', err);
+      alert('Error starting battle. Please try again.');
     } finally {
       setIsStarting(false);
     }
