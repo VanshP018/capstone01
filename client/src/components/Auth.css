@@ -83,4 +83,30 @@
   border-left: 4px solid #c33;
 }
 
+.auth-footer {
+  margin-top: 20px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+}
+
+.auth-footer p {
+  margin: 0;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #667eea;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  font-size: 14px;
+  transition: color 0.3s;
+}
+
+.link-btn:hover {
+  color: #764ba2;
+}
 

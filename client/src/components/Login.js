@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
 import './Auth.css';
 
 const Login = ({ onLogin }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -30,6 +32,7 @@ const Login = ({ onLogin }) => {
       localStorage.setItem('user', JSON.stringify(response.data.user));
 
       onLogin(response.data.user);
+      navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Error logging in');
     } finally {
@@ -38,10 +41,11 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <div className="auth-card">
-      <h2>Login</h2>
-      {error && <div className="error-message">{error}</div>}
-      <form onSubmit={handleSubmit}>
+    <div className="auth-container">
+      <div className="auth-card">
+        <h2>Login</h2>
+        {error && <div className="error-message">{error}</div>}
+        <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="email">Email</label>
           <input
@@ -68,6 +72,10 @@ const Login = ({ onLogin }) => {
           {loading ? 'Logging in...' : 'Login'}
         </button>
       </form>
+      <div className="auth-footer">
+        <p>Don't have an account? <button onClick={() => navigate('/signup')} className="link-btn">Sign Up</button></p>
+      </div>
+    </div>
     </div>
   );
 };

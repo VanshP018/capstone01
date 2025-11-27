@@ -10,26 +10,35 @@ const Leaderboard = ({ user, onLogout }) => {
   const fetchLeaderboard = async () => {
     try {
       const token = localStorage.getItem('token');
+      console.log('[Leaderboard] Token exists:', !!token);
+      
       if (!token) {
         setError('No authentication token found');
         setLoading(false);
         return;
       }
 
+      console.log('[Leaderboard] Fetching from API...');
       const response = await fetch('http://localhost:5001/api/leaderboard', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
+      console.log('[Leaderboard] Response status:', response.status);
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        console.error('[Leaderboard] Error response:', errorData);
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
+      console.log('[Leaderboard] Data received:', data);
 
       if (data.success) {
         setUsers(data.users || []);
+        setError('');
       } else {
         setError(data.message || 'Failed to load leaderboard');
       }

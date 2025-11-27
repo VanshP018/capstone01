@@ -8,10 +8,13 @@ const User = require('../models/User');
 // @access Private
 router.get('/', protect, async (req, res) => {
   try {
+    console.log('[Leaderboard] Fetching leaderboard data...');
     const users = await User.find()
       .select('username email rating battlesFought tier')
       .sort({ rating: -1 }) // Sort by rating descending
       .limit(100); // Limit to top 100 users
+
+    console.log(`[Leaderboard] Found ${users.length} users`);
 
     res.status(200).json({
       success: true,
@@ -27,6 +30,7 @@ router.get('/', protect, async (req, res) => {
       }))
     });
   } catch (error) {
+    console.error('[Leaderboard] Error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 });

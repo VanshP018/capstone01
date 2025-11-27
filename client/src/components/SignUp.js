@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
 import './Auth.css';
 
 const SignUp = ({ onSignUp }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -35,6 +37,7 @@ const SignUp = ({ onSignUp }) => {
       localStorage.setItem('user', JSON.stringify(response.data.user));
 
       onSignUp(response.data.user);
+      navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Error signing up');
     } finally {
@@ -43,10 +46,11 @@ const SignUp = ({ onSignUp }) => {
   };
 
   return (
-    <div className="auth-card">
-      <h2>Sign Up</h2>
-      {error && <div className="error-message">{error}</div>}
-      <form onSubmit={handleSubmit}>
+    <div className="auth-container">
+      <div className="auth-card">
+        <h2>Sign Up</h2>
+        {error && <div className="error-message">{error}</div>}
+        <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="username">Username</label>
           <input
@@ -84,6 +88,10 @@ const SignUp = ({ onSignUp }) => {
           {loading ? 'Creating Account...' : 'Sign Up'}
         </button>
       </form>
+      <div className="auth-footer">
+        <p>Already have an account? <button onClick={() => navigate('/login')} className="link-btn">Login</button></p>
+      </div>
+    </div>
     </div>
   );
 };
